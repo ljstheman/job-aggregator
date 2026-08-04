@@ -1776,6 +1776,7 @@
   // --- Google Drive 동기화 (여러 기기에서 숨기기/지원현황 공유) ---
   const DRIVE_SERVER = 'Google Drive';
   const DRIVE_FILE_TITLE = 'job-aggregator-state.json';
+  const DRIVE_FOLDER_ID = '1yLvcV9jeqou4GnuRvshbO5Vw-TJMFQ-o'; // "Job Aggregator" 폴더
   const syncStatusEl = document.getElementById('sync-status');
   let driveSaveTimer = null;
 
@@ -1795,7 +1796,7 @@
     }
     try {
       const searchRes = await window.claude.mcp.callTool(DRIVE_SERVER, 'search_files', {
-        query: `title = '${DRIVE_FILE_TITLE}'`,
+        query: `title = '${DRIVE_FILE_TITLE}' and parentId = '${DRIVE_FOLDER_ID}'`,
         pageSize: 20,
       });
       const files = (searchRes.payload && searchRes.payload.files) || [];
@@ -1845,6 +1846,7 @@
     try {
       await window.claude.mcp.callTool(DRIVE_SERVER, 'create_file', {
         title: DRIVE_FILE_TITLE,
+        parentId: DRIVE_FOLDER_ID,
         textContent: JSON.stringify({
           hiddenPostings: store.hiddenPostings,
           hiddenCompanies: store.hiddenCompanies,
