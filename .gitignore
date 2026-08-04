@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+
+# 개인 이력서/문서 (git 추적 금지)
+Resume/

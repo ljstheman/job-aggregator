@@ -1,0 +1,18 @@
+{
+  "saramin": {
+    "enabled": true,
+    "request_delay_seconds": 2.0,
+    "user_agent": "JobAggregatorBot/1.0 (personal use)"
+  },
+  "jobkorea": {
+    "enabled": true,
+    "request_delay_seconds": 2.0,
+    "user_agent": "JobAggregatorBot/1.0 (personal use)"
+  },
+  "filters": {
+    "keywords": ["백엔드", "Python"],
+    "regions": ["서울", "경기"],
+    "career_levels": ["신입", "경력무관"]
+  },
+  "db_path": "data/jobs.db"
+}

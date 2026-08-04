@@ -1,0 +1,1998 @@
+<title>취업공고 대시보드</title>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --surface: #ffffff;
+    --surface-hover: #fbfaf6;
+    --border: #e4e0d6;
+    --text: #211f1a;
+    --text-muted: #6f6a5f;
+    --text-faint: #a29c8d;
+    --accent: #1f6f5c;
+    --accent-soft: #e3efe9;
+    --accent-strong: #14493c;
+    --saramin: #b1552c;
+    --saramin-soft: #f5e6dc;
+    --jobkorea: #3a54a0;
+    --jobkorea-soft: #e3e7f5;
+    --new: #b1552c;
+    --shadow: 0 1px 2px rgba(33, 31, 26, 0.04), 0 6px 20px rgba(33, 31, 26, 0.05);
+    --radius: 14px;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161512;
+      --surface: #1f1e1a;
+      --surface-hover: #262420;
+      --border: #34322b;
+      --text: #efece4;
+      --text-muted: #a9a396;
+      --text-faint: #756f62;
+      --accent: #5fbfa2;
+      --accent-soft: #1f342d;
+      --accent-strong: #8fd8bf;
+      --saramin: #e0956a;
+      --saramin-soft: #3a2a20;
+      --jobkorea: #8fa3e3;
+      --jobkorea-soft: #232a44;
+      --new: #e0956a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #161512;
+    --surface: #1f1e1a;
+    --surface-hover: #262420;
+    --border: #34322b;
+    --text: #efece4;
+    --text-muted: #a9a396;
+    --text-faint: #756f62;
+    --accent: #5fbfa2;
+    --accent-soft: #1f342d;
+    --accent-strong: #8fd8bf;
+    --saramin: #e0956a;
+    --saramin-soft: #3a2a20;
+    --jobkorea: #8fa3e3;
+    --jobkorea-soft: #232a44;
+    --new: #e0956a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f6f4ef;
+    --surface: #ffffff;
+    --surface-hover: #fbfaf6;
+    --border: #e4e0d6;
+    --text: #211f1a;
+    --text-muted: #6f6a5f;
+    --text-faint: #a29c8d;
+    --accent: #1f6f5c;
+    --accent-soft: #e3efe9;
+    --accent-strong: #14493c;
+    --saramin: #b1552c;
+    --saramin-soft: #f5e6dc;
+    --jobkorea: #3a54a0;
+    --jobkorea-soft: #e3e7f5;
+    --new: #b1552c;
+    --shadow: 0 1px 2px rgba(33, 31, 26, 0.04), 0 6px 20px rgba(33, 31, 26, 0.05);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+      'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: none;
+    margin: 0 auto;
+    padding: 36px clamp(20px, 3vw, 64px) 80px;
+  }
+
+  header.page-head {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 28px;
+  }
+
+  .eyebrow {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    margin: 6px 0 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .subline {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .stat-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-tile .num {
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .stat-tile .label {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .stat-tile.saramin .num { color: var(--saramin); }
+  .stat-tile.jobkorea .num { color: var(--jobkorea); }
+
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 0;
+    margin-bottom: 6px;
+    background: linear-gradient(var(--bg) 78%, transparent);
+  }
+
+  .controls input[type="search"] {
+    flex: 1 1 220px;
+    min-width: 180px;
+  }
+
+  .controls input,
+  .controls select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: inherit;
+  }
+
+  .controls input:focus,
+  .controls select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .controls select { cursor: pointer; }
+
+  .result-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 14px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .result-line strong {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .card:hover { background: var(--surface-hover); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 0;
+    border-radius: 8px;
+    letter-spacing: 0.01em;
+  }
+
+  .badge.saramin { background: var(--saramin-soft); color: var(--saramin); }
+  .badge.jobkorea { background: var(--jobkorea-soft); color: var(--jobkorea); }
+
+  .card-main { min-width: 0; }
+
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .card-title {
+    font-size: 15.5px;
+    font-weight: 650;
+    color: var(--text);
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  a.card-title:hover { color: var(--accent); text-decoration: underline; }
+
+  .new-pill {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--new);
+    border: 1px solid var(--new);
+    border-radius: 100px;
+    padding: 1px 7px;
+    letter-spacing: 0.02em;
+  }
+
+  .card-company {
+    margin-top: 3px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  .card-meta {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+
+  .card-side {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    min-width: 148px;
+  }
+
+  .status-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 4px 6px;
+    font-size: 12px;
+    color: var(--text);
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .status-select.is-set {
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text-faint);
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .icon-btn:hover {
+    color: var(--text);
+    border-color: var(--text-faint);
+  }
+
+  .card.is-hidden {
+    opacity: 0.55;
+  }
+
+  .card.is-hidden .card-title {
+    text-decoration: line-through;
+  }
+
+  .deadline {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .go-link {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .go-link:hover { text-decoration: underline; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state .glyph {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 620px) {
+    .card { grid-template-columns: 1fr; }
+    .badge { width: fit-content; padding: 4px 10px; }
+    .card-side { flex-direction: row; align-items: center; justify-content: space-between; width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div>
+      <div class="eyebrow">Job Aggregator</div>
+      <h1>취업공고 대시보드</h1>
+      <div class="subline" id="generated-line">불러오는 중…</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-tile">
+        <div class="num" id="stat-filtered">–</div>
+        <div class="label">조건에 맞는 공고</div>
+      </div>
+      <div class="stat-tile">
+        <div class="num" id="stat-total">–</div>
+        <div class="label">전체 누적 공고</div>
+      </div>
+      <div class="stat-tile saramin">
+        <div class="num" id="stat-saramin">–</div>
+        <div class="label">사람인</div>
+      </div>
+      <div class="stat-tile jobkorea">
+        <div class="num" id="stat-jobkorea">–</div>
+        <div class="label">잡코리아</div>
+      </div>
+      <div class="stat-tile">
+        <div class="num" id="stat-applied">–</div>
+        <div class="label">지원 진행 중</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input type="search" id="f-search" placeholder="제목, 회사, 기술스택 검색" />
+    <select id="f-region"><option value="">지역 전체</option></select>
+    <select id="f-career"><option value="">경력 전체</option></select>
+    <select id="f-source">
+      <option value="">출처 전체</option>
+      <option value="saramin">사람인</option>
+      <option value="jobkorea">잡코리아</option>
+    </select>
+    <select id="f-status">
+      <option value="">지원상태 전체</option>
+      <option value="__unset">상태 미지정</option>
+      <option value="관심">관심</option>
+      <option value="지원함">지원함</option>
+      <option value="서류전형">서류전형</option>
+      <option value="면접">면접</option>
+      <option value="최종합격">최종합격</option>
+      <option value="불합격">불합격</option>
+    </select>
+    <select id="f-sort">
+      <option value="recent">최신 수집순</option>
+      <option value="deadline">마감임박순</option>
+    </select>
+    <button type="button" class="icon-btn" id="toggle-hidden"><span id="toggle-hidden-label">숨긴 공고 보기</span> (<span id="hidden-count">0</span>)</button>
+  </div>
+
+  <div class="result-line">
+    <span><strong id="visible-count">0</strong>건 표시 중</span>
+    <span id="filter-summary"></span>
+  </div>
+
+  <div class="list" id="list"></div>
+  <div class="empty-state" id="empty-state" style="display:none">
+    <div class="glyph">🗂️</div>
+    조건에 맞는 공고가 없습니다. 검색어나 필터를 조정해 보세요.
+  </div>
+
+  <footer>
+    <span>사람인 · 잡코리아 검색결과 페이지를 주기적으로 수집해 정리합니다.</span>
+    <span id="footer-generated"></span>
+  </footer>
+</div>
+
+<script type="application/json" id="job-data">
+{
+  "generated_at": "2026-08-04T08:35:27.257290+00:00",
+  "total_postings": 345,
+  "filtered_postings": 60,
+  "filters": {
+    "keywords": [
+      "백엔드",
+      "Python"
+    ],
+    "regions": [
+      "서울",
+      "경기"
+    ],
+    "career_levels": [
+      "신입",
+      "경력무관"
+    ]
+  },
+  "postings": [
+    {
+      "source": "jobkorea",
+      "external_id": "49336523",
+      "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49336523",
+      "title": "[Product Center] AI Backend Engineer (신입/경력)",
+      "company": "㈜솔트룩스",
+      "location": "서울 송파구 외 2",
+      "career_level": "신입/경력",
+      "employment_type": "",
+      "description": "",
+      "tags": [
+        "솔루션",
+        "SI",
+        "CRM",
+        "ERP",
+        "백엔드개발자"
+      ],
+      "posted_at": null,
+      "deadline": null,
+      "fetched_at": "2026-08-04T08:32:46.504831+00:00"
+    },
+    {
+      "source": "jobkorea",
+      "external_id": "49654013",
+      "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49654013",
+      "title": "시스템 접근제어 솔루션 Backend 개발자 채용 (신입/경력)",
+      "company": "펜타시스템테크놀러지㈜",
+      "location": "서울 영등포구",
+      "career_level": "신입/경력",
+      "employment_type": "",
+      "description": "",
+      "tags": [
+        "솔루션",
+        "SI",
+        "CRM",
+        "ERP",
+        "백엔드개발자"
+      ],
+      "posted_at": null,
+      "deadline": null,
+      "fetched_at": "2026-08-04T08:32:46.491757+00:00"
+    },
+    {
+      "source": "jobkorea",
+      "external_id": "49548598",
+      "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49548598",
+      "title": "콘텐츠 플랫폼 백엔드 개발(신입)",
+      "company": "㈜드림어스컴퍼니",
+      "location": "서울 강남구",
+      "career_level": "신입",
+      "employment_type": "",
+      "description": "",
+      "tags": [
+        "포털",
+        "컨텐츠",
+        "커뮤니티",
+        "백엔드개발자"
+      ],
+      "posted_at": null,
+      "deadline": null,
+      "fetched_at": "2026-08-04T08:32:46.471244+00:00"
+    },
+    {
+      "source": "jobkorea",
+      "external_id": "49705317",
+      "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49705317",
+      "title": "[에코마케팅]백엔드 개발자(Java) 인턴/신입 채용",
+      "company": "㈜에코마케팅",
+      "location": "서울 송파구",
+      "career_level": "신입",
+      "employment_type": "",
+      "description": "",
+      "tags": [
+        "광고",
+        "홍보",
+        "전시",
+        "백엔드개발자"
+      ],
+      "posted_at": null,
+      "deadline": null,
+      "fetched_at": "2026-08-04T08:32:46.451637+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54402517",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54402517",
+      "title": "(주)디더블유아이에서 AI 분석 서비스 개발자 모십니다",
+      "company": "(주)디더블유아이",
+      "location": "서울 영등포구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "Java",
+        "딥러닝",
+        "풀스택"
+      ],
+      "posted_at": null,
+      "deadline": "채용시",
+      "fetched_at": "2026-08-04T08:32:31.995204+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54526393",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54526393",
+      "title": "열정 가득한 풀스택[Full-Stack]  AI 개발자  모집",
+      "company": "(주)넥스트코어테크놀로지",
+      "location": "서울 송파구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "백엔드/서버개발",
+        "Java",
+        "웹개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/20(목)",
+      "fetched_at": "2026-08-04T08:32:31.978098+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54359749",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54359749",
+      "title": "[코스닥 상장사] AI 연구개발 신입/경력직 채용",
+      "company": "(주)티쓰리엔터테인먼트",
+      "location": "서울 금천구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "게임"
+      ],
+      "posted_at": null,
+      "deadline": "채용시",
+      "fetched_at": "2026-08-04T08:32:31.971292+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54460942",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54460942",
+      "title": "[엑스퍼넷] 부설연구소 솔루션 관련 개발 신입/경력직 채용",
+      "company": "(주)엑스퍼넷",
+      "location": "서울 구로구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "Java",
+        "웹개발",
+        "SI개발",
+        "Git"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/13(목)",
+      "fetched_at": "2026-08-04T08:32:31.957050+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54600436",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54600436",
+      "title": "제품개발팀 : OFFen Backend 개발자(경력무관)",
+      "company": "(주)엔키화이트햇",
+      "location": "서울 송파구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "백엔드/서버개발",
+        "Linux",
+        "웹개발",
+        "웹마스터"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/28(금)",
+      "fetched_at": "2026-08-04T08:32:31.946450+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54384511",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54384511",
+      "title": "인프라(Cloud) 개발자 채용 공고",
+      "company": "(주)인텔리코드",
+      "location": "경기 수원시 영통구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "Java",
+        "Linux",
+        "유지보수",
+        "SQL"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/07(금)",
+      "fetched_at": "2026-08-04T08:32:31.932892+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54235374",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54235374",
+      "title": "AI 어플리케이션 개발자 모집",
+      "company": "(주)엘핀",
+      "location": "서울 강서구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "백엔드/서버개발",
+        "머신러닝",
+        "딥러닝"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/19(수)",
+      "fetched_at": "2026-08-04T08:32:31.909682+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54585351",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54585351",
+      "title": "보안 연구소 솔루션 개발자(신입)",
+      "company": "(주)위드네트웍스",
+      "location": "서울 강서구",
+      "career_level": "신입",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "백엔드/서버개발",
+        "Linux",
+        "Django",
+        "Docker"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/26(수)",
+      "fetched_at": "2026-08-04T08:32:31.874592+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54105115",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54105115",
+      "title": "AIR 부문 AI 전문 Engineer 채용 (경력)",
+      "company": "메가존클라우드(주)",
+      "location": "경기 과천시",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "Kubernetes",
+        "React",
+        "AWS"
+      ],
+      "posted_at": null,
+      "deadline": "상시채용",
+      "fetched_at": "2026-08-04T08:32:31.854272+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54582638",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54582638",
+      "title": "[코스닥 상장] EDR 에이전트(Windows) 개발자를 모십니다.",
+      "company": "(주)모니터랩",
+      "location": "서울 구로구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "C++",
+        "백엔드/서버개발",
+        "머신러닝",
+        "C언어"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/27(목)",
+      "fetched_at": "2026-08-04T08:32:31.827757+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54362741",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54362741",
+      "title": "[SW] AI 중심 차세대 그룹웨어 구축 프로젝트 인력 채용",
+      "company": "(주)폴라리스에이아이핸디",
+      "location": "경기 안양시 동안구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "Docker",
+        "AI(인공지능)",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/01(화)",
+      "fetched_at": "2026-08-04T08:32:31.823768+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54607858",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54607858",
+      "title": "[비트컴퓨터] 신사업 풀스택 개발자 (Product Engineer)",
+      "company": "(주)비트컴퓨터",
+      "location": "서울 서초구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "백엔드/서버개발",
+        "Java",
+        "웹개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/29(토)",
+      "fetched_at": "2026-08-04T08:32:31.814592+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54635982",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54635982",
+      "title": "Python 기반 데이터 모델링 (을지로, 5개월 계약직)",
+      "company": "(주)더블유에이아이",
+      "location": "서울 중구",
+      "career_level": "신입·경력",
+      "employment_type": "계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "머신러닝",
+        "빅데이터",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/02(수)",
+      "fetched_at": "2026-08-04T08:32:31.807887+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54381643",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54381643",
+      "title": "[정규직] AI 솔루션 Java 개발자 모집",
+      "company": "(주)퀸텟시스템즈",
+      "location": "서울 영등포구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "백엔드/서버개발",
+        "Java",
+        "웹개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/09(일)",
+      "fetched_at": "2026-08-04T08:32:31.791760+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54567869",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54567869",
+      "title": "에이아이티스토리 AI 개발자 (LLM, M/L) 채용 (신입)",
+      "company": "에이아이티스토리(주)",
+      "location": "서울 마포구",
+      "career_level": "신입",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "머신러닝",
+        "DBA",
+        "ETL",
+        "LMM"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/26(수)",
+      "fetched_at": "2026-08-04T08:32:31.784377+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54580418",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54580418",
+      "title": "머신비전  개발자 , C/C++/C#, OpenCV, MIL, PYTHON, 딥러닝, AI",
+      "company": "(주)핸디비전",
+      "location": "경기 수원시 영통구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "C++",
+        "머신러닝",
+        "S/W"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/26(토)",
+      "fetched_at": "2026-08-04T08:32:31.754395+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54607643",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54607643",
+      "title": "AI 업무 자동화 및 챗봇 개발/운영 신입/경력 채용 (Java, Spring Boot, 파이썬)",
+      "company": "(주)사조시스템즈",
+      "location": "서울 서대문구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "Java",
+        "웹개발",
+        "MSSQL"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/09(일)",
+      "fetched_at": "2026-08-04T08:32:31.751151+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54484811",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54484811",
+      "title": "생성형 AI 빅데이터 마케팅 플랫폼 데이터엔지니어(python)채용",
+      "company": "(주)빅링크에이아이",
+      "location": "서울 강남구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "C++",
+        "Django",
+        "MySQL"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/15(토)",
+      "fetched_at": "2026-08-04T08:32:31.745114+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54503528",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54503528",
+      "title": "[Python 기반] 내비게이션 테스트 자동화 스크립트 개발",
+      "company": "(주)모디엠",
+      "location": "서울 성동구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "C++",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/19(수)",
+      "fetched_at": "2026-08-04T08:32:31.731895+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54433302",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54433302",
+      "title": "[Kotlin/Python] 백엔드 엔지니어 전환형 인턴",
+      "company": "(주)디써클",
+      "location": "서울 강남구",
+      "career_level": "신입",
+      "employment_type": "인턴직",
+      "description": "",
+      "tags": [
+        "AI(인공지능)",
+        "백엔드/서버개발",
+        "데이터엔지니어",
+        "종합포털"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/09(일)",
+      "fetched_at": "2026-08-04T08:32:31.715618+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54452495",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54452495",
+      "title": "(주)파워텔레콤에서 Python·PHP 백엔드 개발자 모집해요",
+      "company": "(주)파워정보통신",
+      "location": "경기 하남시",
+      "career_level": "경력무관",
+      "employment_type": "계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "백엔드/서버개발",
+        "웹개발",
+        "PostgreSQL",
+        "Ajax"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/12(수)",
+      "fetched_at": "2026-08-04T08:32:31.712302+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54519167",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54519167",
+      "title": "데이터분석/Python/AI LLM RAG/SAS 인재 채용/서비스기획 및 개",
+      "company": "(주)그루넷",
+      "location": "서울 강남구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "클라우드",
+        "빅데이터",
+        "데이터분석가",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/20(목)",
+      "fetched_at": "2026-08-04T08:32:31.705544+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54118653",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54118653",
+      "title": "(주)밸리언트데이터에서 Python Web Full-Stack 개발자를 찾고 있어요",
+      "company": "(주)밸리언트데이터",
+      "location": "경기 성남시 분당구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "웹개발",
+        "웹호스팅"
+      ],
+      "posted_at": null,
+      "deadline": "채용시",
+      "fetched_at": "2026-08-04T08:32:31.699472+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54614642",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54614642",
+      "title": "[산업기능요원/병역특례] 백엔드(python) 개발자 채용",
+      "company": "(주)게임엔",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "백엔드/서버개발",
+        "웹개발",
+        "유지보수",
+        "Git"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/06(목)",
+      "fetched_at": "2026-08-04T08:32:31.689678+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54575752",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54575752",
+      "title": "[뉴로코어] Python Backend Engineer 채용",
+      "company": "(주)뉴로코어",
+      "location": "서울 강남구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "Python",
+        "AI(인공지능)",
+        "Linux",
+        "NLP(자연어처리)",
+        "PostgreSQL"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/26(수)",
+      "fetched_at": "2026-08-04T08:32:31.673350+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54620522",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54620522",
+      "title": "Python 개발자 채용",
+      "company": "(주)엠클라우독",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Python",
+        "Java",
+        "Linux",
+        "S/W",
+        "딥러닝"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/16(일)",
+      "fetched_at": "2026-08-04T08:32:31.653970+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54447646",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54447646",
+      "title": "Python 기반 개발자 구인",
+      "company": "(주)노크랩",
+      "location": "서울 성북구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/11(금)",
+      "fetched_at": "2026-08-04T08:32:31.644513+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54637122",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54637122",
+      "title": "[dotory.ai] 설치형 AI 업무 콘솔 백엔드 개발자 채용",
+      "company": "(주)플렉스솔루션",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "Python",
+        "API",
+        "PostgreSQL",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/30(수)",
+      "fetched_at": "2026-08-04T08:32:31.568526+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54610147",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54610147",
+      "title": "(주)케이사인 백엔드 개발자와 함께 성장해요",
+      "company": "(주)케이사인",
+      "location": "경기 과천시",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Java",
+        "Kotlin",
+        "Kubernetes",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/29(토)",
+      "fetched_at": "2026-08-04T08:32:31.552252+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54347235",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54347235",
+      "title": "[캐시워크애즈] 백엔드개발 산업기능요원 모집",
+      "company": "넛지헬스케어(주)",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "산업기능요원·현역",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "Java",
+        "앱개발",
+        "API"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/31(월)",
+      "fetched_at": "2026-08-04T08:32:31.536353+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54392290",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54392290",
+      "title": "HM소프트에서 백엔드 개발자와 함께 성장해요",
+      "company": "HM소프트",
+      "location": "서울 송파구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "앱개발",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/06(목)",
+      "fetched_at": "2026-08-04T08:32:31.533141+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54383929",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54383929",
+      "title": "AI Agent백엔드 개발자 모집 공고",
+      "company": "(주)인텔리코드",
+      "location": "경기 수원시 영통구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "AI(인공지능)",
+        "Python",
+        "PostgreSQL",
+        "MariaDB"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/04(금)",
+      "fetched_at": "2026-08-04T08:32:31.511261+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54531341",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54531341",
+      "title": "클라우드 및 백엔드(PHP) 개발자 채용",
+      "company": "(주)에스씨솔루션글로벌",
+      "location": "경기 용인시 기흥구",
+      "career_level": "경력무관",
+      "employment_type": "계약직·인턴직",
+      "description": "",
+      "tags": [
+        "임베디드",
+        "펌웨어",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/21(금)",
+      "fetched_at": "2026-08-04T08:32:31.507452+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54614645",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54614645",
+      "title": "백엔드(python) 개발자 채용",
+      "company": "(주)게임엔",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "프론트엔드",
+        "Python",
+        "API"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/06(목)",
+      "fetched_at": "2026-08-04T08:32:31.488360+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54347399",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54347399",
+      "title": "Machbase 백엔드 개발자 모집 신입/경력",
+      "company": "(주)마크베이스",
+      "location": "서울 구로구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직·전문연구요원",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "Java",
+        "Python",
+        "Javascript",
+        "IoT"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/15(토)",
+      "fetched_at": "2026-08-04T08:32:31.453004+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54586009",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54586009",
+      "title": "백엔드 개발자 (신입)",
+      "company": "(주)이너버스",
+      "location": "서울 영등포구",
+      "career_level": "신입",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Java",
+        "Python",
+        "Javascript",
+        "QA/테스터",
+        "GoLang"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/26(수)",
+      "fetched_at": "2026-08-04T08:32:31.412972+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54395525",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54395525",
+      "title": "백엔드 개발자 채용 공고",
+      "company": "(주)브레인벤쳐스",
+      "location": "경기 성남시 수정구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "Java",
+        "AWS",
+        "JPA",
+        "Kotlin"
+      ],
+      "posted_at": null,
+      "deadline": "상시채용",
+      "fetched_at": "2026-08-04T08:32:31.384257+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54483243",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54483243",
+      "title": "[ST UNITAS] STack TF 백엔드 개발자 채용",
+      "company": "(주)에스티유니타스",
+      "location": "서울 구로구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "AWS",
+        "Git",
+        "MySQL",
+        "PHP"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/14(월)",
+      "fetched_at": "2026-08-04T08:32:31.368760+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54465231",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54465231",
+      "title": "백엔드 개발자 채용",
+      "company": "지티원(주)",
+      "location": "서울 영등포구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "솔루션업체"
+      ],
+      "posted_at": null,
+      "deadline": "채용시",
+      "fetched_at": "2026-08-04T08:32:31.365691+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54635190",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54635190",
+      "title": "[아름다운가게] 플랫폼사업팀 백엔드개발 단기 채용 (3개월)",
+      "company": "(재)아름다운가게",
+      "location": "서울 중구",
+      "career_level": "경력무관",
+      "employment_type": "기간제·계약직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "재단법인",
+        "시민단체",
+        "NGO·사회공헌"
+      ],
+      "posted_at": null,
+      "deadline": "진행예정",
+      "fetched_at": "2026-08-04T08:32:31.362617+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54582771",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54582771",
+      "title": "[무브인터렉티브] 앱 개발 백엔드 담당자 채용",
+      "company": "(주)무브인터렉티브",
+      "location": "경기 파주시",
+      "career_level": "신입·경력",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "앱개발",
+        "API",
+        "Flutter",
+        "게임개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/26(토)",
+      "fetched_at": "2026-08-04T08:32:31.343756+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54643306",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54643306",
+      "title": "Java React.JS 기반 백엔드, 프론트엔드 SI 웹 개발자 모집",
+      "company": "(주)라임컴퍼니",
+      "location": "서울 구로구",
+      "career_level": "신입",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "웹개발",
+        "SI·시스템통합",
+        "시스템관리",
+        "솔루션업체",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/03(목)",
+      "fetched_at": "2026-08-04T08:32:31.331746+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54385214",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54385214",
+      "title": "데이터플로에서 JAVA 백엔드 개발자 채용해요",
+      "company": "데이터플로",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "웹개발",
+        "Java",
+        "앱개발",
+        "API",
+        "SI개발"
+      ],
+      "posted_at": null,
+      "deadline": "내일마감",
+      "fetched_at": "2026-08-04T08:32:31.328708+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54628715",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54628715",
+      "title": "AI 플랫폼 백엔드 개발자(전문연구요원 가능)",
+      "company": "(주)트윔",
+      "location": "경기 화성시",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "Java",
+        "AI(인공지능)",
+        "Javascript",
+        "SI개발",
+        "딥러닝"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/31(월)",
+      "fetched_at": "2026-08-04T08:32:31.325914+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54618697",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54618697",
+      "title": "(주)월급날 프론트/백엔드 개발자 채용 (신입/경력)",
+      "company": "(주)월급날",
+      "location": "서울 영등포구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "프론트엔드",
+        "Java",
+        "ASP"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/31(월)",
+      "fetched_at": "2026-08-04T08:32:31.322411+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54629613",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54629613",
+      "title": "백엔드(python) 개발자 채용",
+      "company": "휴먼웍스",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "프론트엔드",
+        "Python",
+        "API"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/09(일)",
+      "fetched_at": "2026-08-04T08:32:31.319410+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54613682",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54613682",
+      "title": "IT개발·데이터(백엔드/서버개발 외 2개 부문) 채용 공고",
+      "company": "레데브",
+      "location": "서울 강동구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·기간제",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "게임개발",
+        "SI·시스템통합"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/29(화)",
+      "fetched_at": "2026-08-04T08:32:31.316435+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54626054",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54626054",
+      "title": "주도적으로 설계하는 Java/Spring 백엔드 개발자 채용",
+      "company": "펄포즌(PURPOZEN)",
+      "location": "서울 강남구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "앱개발",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/30(수)",
+      "fetched_at": "2026-08-04T08:32:31.313471+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54628093",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54628093",
+      "title": "졸업 & 스펙 필요 없습니다. - 백엔드 엔지니어 (신입 가능)",
+      "company": "(주)제너러티브랩",
+      "location": "서울 성북구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "소프트웨어개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/01(화)",
+      "fetched_at": "2026-08-04T08:32:31.310615+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54635306",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54635306",
+      "title": "백엔드 개발자(Java) 인턴/신입 채용",
+      "company": "(주)에코마케팅",
+      "location": "서울 송파구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·인턴직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "광고기획사",
+        "광고대행사"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/16(일)",
+      "fetched_at": "2026-08-04T08:32:31.300973+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54566660",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54566660",
+      "title": "웹/앱 프런트 및 백엔드 프로그래머를 모십니다.",
+      "company": "㈜폴리큐브",
+      "location": "서울 강남구",
+      "career_level": "경력무관",
+      "employment_type": "정규직·계약직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "프론트엔드",
+        "Java",
+        "앱개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/09(일)",
+      "fetched_at": "2026-08-04T08:32:31.294792+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54630227",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54630227",
+      "title": "[망고카] 글로벌 플랫폼 백엔드 개발자",
+      "company": "망고카(주)",
+      "location": "서울 영등포구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "API",
+        "DBA",
+        "Azure"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/02(수)",
+      "fetched_at": "2026-08-04T08:32:31.291801+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54630536",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54630536",
+      "title": "(주)대영IoT 2026년도 기술연구소 CTO 및 웹 백엔드 개발자 채용",
+      "company": "(주)대영아이오티",
+      "location": "서울 송파구",
+      "career_level": "경력무관",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "프론트엔드",
+        "Java",
+        "앱개발"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/30(수)",
+      "fetched_at": "2026-08-04T08:32:31.285535+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54487301",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54487301",
+      "title": "[상장사/성수역/대졸신입 초봉4천] 백엔드 개발자 (신입/경력)",
+      "company": "브레인즈컴퍼니(주)",
+      "location": "서울 성동구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "Java",
+        "Git",
+        "Kotlin"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/09(일)",
+      "fetched_at": "2026-08-04T08:32:31.282318+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "53930400",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=53930400",
+      "title": "[수산그룹]수산INT 개발직군 채용(백엔드/서비스기획/QA엔지니어 등)",
+      "company": "(주)수산아이앤티",
+      "location": "서울 강남구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직·병역특례",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "프론트엔드",
+        "Java",
+        "유지보수"
+      ],
+      "posted_at": null,
+      "deadline": "~ 09/20(일)",
+      "fetched_at": "2026-08-04T08:32:31.269875+00:00"
+    },
+    {
+      "source": "saramin",
+      "external_id": "54607844",
+      "url": "https://www.saramin.co.kr/zf_user/jobs/relay/view?rec_idx=54607844",
+      "title": "킨코스코리아㈜ 백엔드 개발자/디자인그룹 경력 및 신입사원 모집",
+      "company": "킨코스코리아(주)",
+      "location": "서울 중구",
+      "career_level": "신입·경력",
+      "employment_type": "정규직",
+      "description": "",
+      "tags": [
+        "백엔드/서버개발",
+        "웹개발",
+        "AI(인공지능)",
+        "Python",
+        "API"
+      ],
+      "posted_at": null,
+      "deadline": "~ 08/07(금)",
+      "fetched_at": "2026-08-04T08:32:31.265305+00:00"
+    }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  const raw = JSON.parse(document.getElementById('job-data').textContent);
+  const postings = raw.postings || [];
+
+  const SOURCE_LABEL = { saramin: '사람인', jobkorea: '잡코리아' };
+  const STATUS_OPTIONS = ['관심', '지원함', '서류전형', '면접', '최종합격', '불합격'];
+
+  const STORE_KEY = 'jobAggregator:v1';
+  function loadStore() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return {
+        hiddenPostings: parsed.hiddenPostings || {},
+        hiddenCompanies: parsed.hiddenCompanies || {},
+        applications: parsed.applications || {},
+      };
+    } catch (e) {
+      return { hiddenPostings: {}, hiddenCompanies: {}, applications: {} };
+    }
+  }
+  function saveStore() {
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  }
+  const store = loadStore();
+
+  function postingKey(p) { return p.source + ':' + p.external_id; }
+  function companyKey(p) { return (p.company || '').trim(); }
+  function isHidden(p) {
+    return !!store.hiddenPostings[postingKey(p)] || !!store.hiddenCompanies[companyKey(p)];
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleString('ko-KR', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  document.getElementById('generated-line').textContent =
+    '최근 갱신: ' + fmtDate(raw.generated_at);
+  document.getElementById('footer-generated').textContent =
+    '데이터 생성 시각: ' + fmtDate(raw.generated_at);
+
+  document.getElementById('stat-filtered').textContent = raw.filtered_postings ?? postings.length;
+  document.getElementById('stat-total').textContent = raw.total_postings ?? '–';
+  document.getElementById('stat-saramin').textContent =
+    postings.filter(p => p.source === 'saramin').length;
+  document.getElementById('stat-jobkorea').textContent =
+    postings.filter(p => p.source === 'jobkorea').length;
+
+  function refreshTopStats() {
+    const appliedCount = Object.values(store.applications)
+      .filter(a => a && a.status).length;
+    document.getElementById('stat-applied').textContent = appliedCount;
+    const hiddenCount = postings.filter(isHidden).length;
+    document.getElementById('hidden-count').textContent = hiddenCount;
+  }
+
+  const f = raw.filters || {};
+  const summaryParts = [];
+  if (f.keywords && f.keywords.length) summaryParts.push('키워드: ' + f.keywords.join(', '));
+  if (f.regions && f.regions.length) summaryParts.push('지역: ' + f.regions.join(', '));
+  if (f.career_levels && f.career_levels.length) summaryParts.push('경력: ' + f.career_levels.join(', '));
+  document.getElementById('filter-summary').textContent = summaryParts.join(' · ');
+
+  function uniqueSorted(values) {
+    return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ko'));
+  }
+
+  const regionSel = document.getElementById('f-region');
+  uniqueSorted(postings.map(p => (p.location || '').split(' ')[0])).forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = r;
+    regionSel.appendChild(opt);
+  });
+
+  const careerSel = document.getElementById('f-career');
+  uniqueSorted(postings.map(p => p.career_level)).forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    careerSel.appendChild(opt);
+  });
+
+  const listEl = document.getElementById('list');
+  const emptyEl = document.getElementById('empty-state');
+  const visibleCountEl = document.getElementById('visible-count');
+
+  const now = Date.now();
+  const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+
+  function deadlineSortKey(p) {
+    const m = (p.deadline || '').match(/(\d{2})\/(\d{2})/);
+    if (!m) return Infinity;
+    const year = new Date().getFullYear();
+    const d = new Date(year, parseInt(m[1], 10) - 1, parseInt(m[2], 10));
+    return d.getTime();
+  }
+
+  let showHidden = false;
+
+  function render() {
+    const q = document.getElementById('f-search').value.trim().toLowerCase();
+    const region = regionSel.value;
+    const career = careerSel.value;
+    const source = document.getElementById('f-source').value;
+    const status = document.getElementById('f-status').value;
+    const sort = document.getElementById('f-sort').value;
+
+    let rows = postings.filter(p => {
+      const hidden = isHidden(p);
+      if (showHidden) {
+        if (!hidden) return false;
+      } else if (hidden) {
+        return false;
+      }
+      if (region && !(p.location || '').startsWith(region)) return false;
+      if (career && p.career_level !== career) return false;
+      if (source && p.source !== source) return false;
+      if (status) {
+        const cur = (store.applications[postingKey(p)] || {}).status || '';
+        if (status === '__unset') {
+          if (cur) return false;
+        } else if (cur !== status) {
+          return false;
+        }
+      }
+      if (q) {
+        const hay = [p.title, p.company, (p.tags || []).join(' ')].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    rows = rows.slice().sort((a, b) => {
+      if (sort === 'deadline') return deadlineSortKey(a) - deadlineSortKey(b);
+      return new Date(b.fetched_at) - new Date(a.fetched_at);
+    });
+
+    visibleCountEl.textContent = rows.length;
+    listEl.innerHTML = '';
+    emptyEl.style.display = rows.length ? 'none' : '';
+
+    for (const p of rows) {
+      const key = postingKey(p);
+      const isNew = p.fetched_at && (now - new Date(p.fetched_at).getTime()) < ONE_WEEK;
+      const hidden = isHidden(p);
+      const appliedStatus = (store.applications[key] || {}).status || '';
+
+      const card = document.createElement('div');
+      card.className = 'card' + (hidden ? ' is-hidden' : '');
+      card.dataset.key = key;
+      card.dataset.company = companyKey(p);
+
+      const chips = [p.location, p.career_level, p.employment_type]
+        .filter(Boolean)
+        .map(c => `<span class="chip">${escapeHtml(c)}</span>`)
+        .join('');
+
+      const statusOptions = ['<option value="">상태 없음</option>']
+        .concat(STATUS_OPTIONS.map(s =>
+          `<option value="${s}" ${s === appliedStatus ? 'selected' : ''}>${s}</option>`))
+        .join('');
+
+      const actionsHtml = hidden
+        ? `<button type="button" class="icon-btn" data-action="restore">복원</button>`
+        : `<button type="button" class="icon-btn" data-action="hide-posting">공고 숨기기</button>
+           <button type="button" class="icon-btn" data-action="hide-company">회사 숨기기</button>`;
+
+      card.innerHTML = `
+        <span class="badge ${p.source}">${SOURCE_LABEL[p.source] || p.source}</span>
+        <div class="card-main">
+          <div class="card-title-row">
+            <a class="card-title" href="${escapeAttr(p.url)}" target="_blank" rel="noopener noreferrer" title="${escapeAttr(p.title)}">${escapeHtml(p.title)}</a>
+            ${isNew ? '<span class="new-pill">NEW</span>' : ''}
+          </div>
+          <div class="card-company">${escapeHtml(p.company)}</div>
+          <div class="card-meta">${chips}</div>
+        </div>
+        <div class="card-side">
+          <span class="deadline">${escapeHtml(p.deadline || '')}</span>
+          <a class="go-link" href="${escapeAttr(p.url)}" target="_blank" rel="noopener noreferrer">공고 보기 ↗</a>
+          <select class="status-select ${appliedStatus ? 'is-set' : ''}" data-role="status">${statusOptions}</select>
+          <div class="card-actions">${actionsHtml}</div>
+        </div>
+      `;
+      listEl.appendChild(card);
+    }
+
+    refreshTopStats();
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  ['f-search', 'f-region', 'f-career', 'f-source', 'f-status', 'f-sort'].forEach(id => {
+    document.getElementById(id).addEventListener('input', render);
+    document.getElementById(id).addEventListener('change', render);
+  });
+
+  const toggleHiddenBtn = document.getElementById('toggle-hidden');
+  const toggleHiddenLabel = document.getElementById('toggle-hidden-label');
+  function updateToggleLabel() {
+    toggleHiddenLabel.textContent = showHidden ? '숨긴 공고만 표시 중 · 돌아가기' : '숨긴 공고 보기';
+  }
+  toggleHiddenBtn.addEventListener('click', () => {
+    showHidden = !showHidden;
+    updateToggleLabel();
+    render();
+  });
+
+  listEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const card = e.target.closest('.card');
+    const key = card.dataset.key;
+    const company = card.dataset.company;
+
+    if (btn.dataset.action === 'hide-posting') {
+      store.hiddenPostings[key] = true;
+    } else if (btn.dataset.action === 'hide-company') {
+      if (company) store.hiddenCompanies[company] = true;
+    } else if (btn.dataset.action === 'restore') {
+      delete store.hiddenPostings[key];
+      if (company) delete store.hiddenCompanies[company];
+    }
+    saveStore();
+    render();
+  });
+
+  listEl.addEventListener('change', (e) => {
+    const sel = e.target.closest('select[data-role="status"]');
+    if (!sel) return;
+    const card = e.target.closest('.card');
+    const key = card.dataset.key;
+    const value = sel.value;
+    if (value) {
+      store.applications[key] = { status: value, updatedAt: new Date().toISOString() };
+    } else {
+      delete store.applications[key];
+    }
+    saveStore();
+    sel.classList.toggle('is-set', !!value);
+    refreshTopStats();
+  });
+
+  render();
+})();
+</script>
