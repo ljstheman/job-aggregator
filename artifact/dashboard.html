@@ -464,6 +464,7 @@
       <option value="deadline">마감임박순</option>
     </select>
     <button type="button" class="icon-btn" id="toggle-hidden"><span id="toggle-hidden-label">숨긴 공고 보기</span> (<span id="hidden-count">0</span>)</button>
+    <span class="icon-btn" id="sync-status" style="cursor:default">☁ 확인 중…</span>
   </div>
 
   <div class="result-line">
@@ -1772,6 +1773,92 @@
     return !!store.hiddenPostings[postingKey(p)] || !!store.hiddenCompanies[companyKey(p)];
   }
 
+  // --- Google Drive 동기화 (여러 기기에서 숨기기/지원현황 공유) ---
+  const DRIVE_SERVER = 'Google Drive';
+  const DRIVE_FILE_TITLE = 'job-aggregator-state.json';
+  const syncStatusEl = document.getElementById('sync-status');
+  let driveSaveTimer = null;
+
+  function setSyncStatus(text) {
+    syncStatusEl.textContent = '☁ ' + text;
+  }
+
+  function base64ToUtf8(b64) {
+    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  async function loadFromDrive() {
+    if (!window.claude || !window.claude.mcp) {
+      setSyncStatus('이 보기에서는 동기화 불가 (로컬 저장만 사용)');
+      return;
+    }
+    try {
+      const searchRes = await window.claude.mcp.callTool(DRIVE_SERVER, 'search_files', {
+        query: `title = '${DRIVE_FILE_TITLE}'`,
+        pageSize: 20,
+      });
+      const files = (searchRes.payload && searchRes.payload.files) || [];
+      if (!files.length) {
+        setSyncStatus('동기화 준비됨 (저장된 기록 없음)');
+        return;
+      }
+      files.sort((a, b) => new Date(b.modifiedTime) - new Date(a.modifiedTime));
+      const latest = files[0];
+
+      const dlRes = await window.claude.mcp.callTool(DRIVE_SERVER, 'download_file_content', { fileId: latest.id });
+      const json = base64ToUtf8(dlRes.payload.content);
+      const remote = JSON.parse(json);
+
+      store.hiddenPostings = remote.hiddenPostings || {};
+      store.hiddenCompanies = remote.hiddenCompanies || {};
+      store.applications = remote.applications || {};
+      saveStore(); // 로컬 캐시도 최신 상태로 맞춤
+      setSyncStatus('동기화됨 · ' + fmtShortTime(latest.modifiedTime));
+      render();
+    } catch (err) {
+      const code = err && err.code;
+      if (code === 'server_not_connected' || code === 'not_granted') {
+        setSyncStatus('Google Drive 연결 안 됨 (로컬 저장만 사용)');
+      } else if (code === 'needs_reauth') {
+        setSyncStatus('Google Drive 재연결 필요 (claude.ai 설정 > 커넥터)');
+      } else {
+        setSyncStatus('동기화 실패, 로컬 저장만 사용 중');
+      }
+    }
+  }
+
+  function fmtShortTime(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function saveToDriveDebounced() {
+    if (!window.claude || !window.claude.mcp) return;
+    clearTimeout(driveSaveTimer);
+    setSyncStatus('저장 중…');
+    driveSaveTimer = setTimeout(saveToDrive, 1500);
+  }
+
+  async function saveToDrive() {
+    try {
+      await window.claude.mcp.callTool(DRIVE_SERVER, 'create_file', {
+        title: DRIVE_FILE_TITLE,
+        textContent: JSON.stringify({
+          hiddenPostings: store.hiddenPostings,
+          hiddenCompanies: store.hiddenCompanies,
+          applications: store.applications,
+        }),
+        contentMimeType: 'application/json',
+        disableConversionToGoogleType: true,
+      });
+      setSyncStatus('동기화됨 · 방금 전');
+    } catch (err) {
+      setSyncStatus('저장 실패 (로컬에는 저장됨)');
+    }
+  }
+
   function fmtDate(iso) {
     if (!iso) return '';
     const d = new Date(iso);
@@ -1974,6 +2061,7 @@
       if (company) delete store.hiddenCompanies[company];
     }
     saveStore();
+    saveToDriveDebounced();
     render();
   });
 
@@ -1989,10 +2077,12 @@
       delete store.applications[key];
     }
     saveStore();
+    saveToDriveDebounced();
     sel.classList.toggle('is-set', !!value);
     refreshTopStats();
   });
 
   render();
+  loadFromDrive();
 })();
 </script>
