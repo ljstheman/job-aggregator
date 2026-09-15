@@ -12,6 +12,7 @@ from src.config import load_config
 from src.scrapers.base import BaseScraper
 from src.scrapers.saramin import SaraminScraper
 from src.scrapers.jobkorea import JobKoreaScraper
+from src.scrapers.peoplenjob import PeopleNJobScraper
 from src.storage import count_postings, init_db, upsert_posting
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 SCRAPERS: dict[str, type[BaseScraper]] = {
     "saramin": SaraminScraper,
     "jobkorea": JobKoreaScraper,
+    "peoplenjob": PeopleNJobScraper,
 }
 
 

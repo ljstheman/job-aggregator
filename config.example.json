@@ -9,10 +9,21 @@
     "request_delay_seconds": 2.0,
     "user_agent": "JobAggregatorBot/1.0 (personal use)"
   },
+  "peoplenjob": {
+    "enabled": true,
+    "request_delay_seconds": 2.0,
+    "user_agent": "JobAggregatorBot/1.0 (personal use)"
+  },
   "filters": {
     "keywords": ["백엔드", "Python"],
+    "exclude_keywords": [],
     "regions": ["서울", "경기"],
-    "career_levels": ["신입", "경력무관"]
+    "career_levels": ["신입", "경력무관"],
+    "career_level_exempt_sources": [],
+    "min_experience_years": 0,
+    "exclude_junior_titles": false,
+    "min_salary_manwon": 0
   },
-  "db_path": "data/jobs.db"
+  "db_path": "data/jobs.db",
+  "dart_api_key": ""
 }

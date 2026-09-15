@@ -4,3 +4,14 @@ __pycache__/
 
 # 개인 이력서/문서 (git 추적 금지)
 Resume/
+이직준비/
+
+# 개인 법률 문서 (git 추적 금지)
+artifact/중앙노동/
+
+# 개인 설정 (DART API 키 등 비밀값 포함, git 추적 금지)
+config.json
+
+# 재생성 가능한 로컬 캐시 (용량 크고 API로 다시 받을 수 있음)
+data/dart_corp_codes.json
+data/dart_financials.json
