@@ -22,6 +22,8 @@ def load_config(path: str = DEFAULT_CONFIG_PATH) -> dict:
     cfg["filters"].setdefault("keywords", [])
     cfg["filters"].setdefault("regions", [])
     cfg["filters"].setdefault("exclude_keywords", [])
+    cfg["filters"].setdefault("conditional_keywords", [])
+    cfg["filters"].setdefault("conditional_keywords_min_revenue_eok", 0)
     cfg["filters"].setdefault("career_levels", [])
     cfg["filters"].setdefault("career_level_exempt_sources", [])
     cfg["filters"].setdefault("min_experience_years", 0)

@@ -17,6 +17,8 @@
   "filters": {
     "keywords": ["백엔드", "Python"],
     "exclude_keywords": [],
+    "conditional_keywords": [],
+    "conditional_keywords_min_revenue_eok": 0,
     "regions": ["서울", "경기"],
     "career_levels": ["신입", "경력무관"],
     "career_level_exempt_sources": [],

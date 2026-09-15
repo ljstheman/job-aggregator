@@ -18,25 +18,34 @@ from src.dart_client import build_company_revenue_map
 from src.filters import apply_filters, build_filters_from_config
 from src.storage import init_db, query_postings
 
+PHARMA_KEYWORDS = ["제약", "바이오", "파마", "의약품"]
 
-def _attach_revenue(postings: list, dart_api_key: str) -> None:
-    """postings(dict) 리스트에 회사 매출 정보를 붙이고, 매출 내림차순으로 정렬한다
-    (매출 정보 없는 회사는 맨 뒤, 그 안에서는 기존 순서 유지)."""
-    if not dart_api_key:
-        for d in postings:
-            d["revenue"] = None
-            d["revenue_year"] = None
-        return
 
-    company_names = {d["company"] for d in postings if d.get("company")}
-    revenue_map = build_company_revenue_map(company_names, dart_api_key)
+def _to_display_dict(posting) -> dict:
+    d = posting.to_dict()
+    d.pop("raw_json", None)  # 대시보드 표시에 불필요, 용량만 키움
+    return d
 
-    for d in postings:
-        info = revenue_map.get(d.get("company"), {})
-        d["revenue"] = info.get("revenue")
-        d["revenue_year"] = info.get("year")
 
-    postings.sort(key=lambda d: (d["revenue"] is None, -(d["revenue"] or 0)))
+def _is_pharma(d: dict) -> bool:
+    haystack = " ".join([d.get("title", ""), d.get("company", ""), " ".join(d.get("tags", []))])
+    return any(k in haystack for k in PHARMA_KEYWORDS)
+
+
+def _broaden_with_conditional_keywords(all_postings: list, cfg: dict, base_keys: set) -> list:
+    """conditional_keywords(예: 해외영업/수출)까지 포함해서 다시 필터링하고,
+    기본 필터 결과에는 없던 공고만 후보로 반환한다. 최종 포함 여부는
+    회사 매출(중견기업 이상)로 별도 검증한다."""
+    conditional_keywords = cfg.get("filters", {}).get("conditional_keywords", [])
+    if not conditional_keywords:
+        return []
+
+    broadened_cfg = {**cfg, "filters": {**cfg.get("filters", {})}}
+    broadened_cfg["filters"]["keywords"] = (
+        cfg.get("filters", {}).get("keywords", []) + conditional_keywords
+    )
+    broadened = apply_filters(all_postings, build_filters_from_config(broadened_cfg))
+    return [p for p in broadened if (p.source, p.external_id) not in base_keys]
 
 
 def export(config_path: str = "config.json", out_path: str | None = None) -> dict:
@@ -45,23 +54,46 @@ def export(config_path: str = "config.json", out_path: str | None = None) -> dic
     all_postings = query_postings(conn)
     conn.close()
 
-    filters = build_filters_from_config(cfg)
-    filtered = apply_filters(all_postings, filters)
+    base_filtered = apply_filters(all_postings, build_filters_from_config(cfg))
+    base_keys = {(p.source, p.external_id) for p in base_filtered}
 
-    def to_display_dict(posting):
-        d = posting.to_dict()
-        d.pop("raw_json", None)  # 대시보드 표시에 불필요, 용량만 키움
-        return d
+    extra_candidates = _broaden_with_conditional_keywords(all_postings, cfg, base_keys)
 
-    filtered_dicts = [to_display_dict(p) for p in filtered]
-    _attach_revenue(filtered_dicts, cfg.get("dart_api_key", ""))
+    base_dicts = [_to_display_dict(p) for p in base_filtered]
+    extra_dicts = [_to_display_dict(p) for p in extra_candidates]
+
+    dart_api_key = cfg.get("dart_api_key", "")
+    all_company_names = {d["company"] for d in base_dicts + extra_dicts if d.get("company")}
+    revenue_map = (
+        build_company_revenue_map(all_company_names, dart_api_key) if dart_api_key else {}
+    )
+
+    # 조건부 후보(해외영업/수출 등)는 회사 매출이 중견기업 이상 기준을 넘을 때만 최종 포함
+    min_revenue_won = (
+        cfg.get("filters", {}).get("conditional_keywords_min_revenue_eok", 0) * 100_000_000
+    )
+    qualifying_extra = []
+    for d in extra_dicts:
+        revenue = revenue_map.get(d["company"], {}).get("revenue")
+        if revenue is not None and revenue >= min_revenue_won:
+            qualifying_extra.append(d)
+
+    final_dicts = base_dicts + qualifying_extra
+    for d in final_dicts:
+        info = revenue_map.get(d["company"], {})
+        d["revenue"] = info.get("revenue")
+        d["revenue_year"] = info.get("year")
+        d["pharma"] = _is_pharma(d)
+
+    # 제약/바이오 업계 최상단 우선, 그 다음 매출 내림차순 (매출 정보 없으면 맨 뒤)
+    final_dicts.sort(key=lambda d: (0 if d["pharma"] else 1, d["revenue"] is None, -(d["revenue"] or 0)))
 
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "total_postings": len(all_postings),
-        "filtered_postings": len(filtered),
+        "filtered_postings": len(final_dicts),
         "filters": cfg.get("filters", {}),
-        "postings": filtered_dicts,
+        "postings": final_dicts,
     }
 
     if out_path:

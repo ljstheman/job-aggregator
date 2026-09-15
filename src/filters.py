@@ -37,7 +37,9 @@ class ExcludeKeywordFilter:
     def matches(self, posting: JobPosting) -> bool:
         if not self.keywords:
             return True
-        haystack = " ".join([posting.title, " ".join(posting.tags)]).lower()
+        haystack = " ".join(
+            [posting.title, posting.employment_type, " ".join(posting.tags)]
+        ).lower()
         return not any(k in haystack for k in self.keywords)
 
 
